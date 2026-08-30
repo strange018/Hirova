@@ -66,6 +66,7 @@ class InterviewSession(models.Model):
     score = models.FloatField(blank=True, null=True)
     recommendation = models.CharField(max_length=50, blank=True, null=True)
     strengths = models.TextField(blank=True, null=True)
+    is_published = models.BooleanField(default=False)
     def __str__(self):
         return f'{self.Application.user.username}-{self.start_time}'
     

@@ -62,7 +62,7 @@ const Leaderboard = () => {
       }
 
       const data = await response.json();
-      console.log("Leaderboard Data:", data[0].images);
+      console.log("Leaderboard Data:", data[0]?.images);
       setLeaderboardData(Array.isArray(data) ? data : data.data || []);
       setLoading(false);
     } catch (err) {
@@ -231,16 +231,16 @@ const Leaderboard = () => {
     if (!projectText) return 'Unnamed Project';
     const firstLine = projectText.split('\n')[0];
     let match = firstLine.match(/^(.+?)\s*\(GitHub\)/) ||
-                firstLine.match(/^(.+?)\s*\|/) ||
-                firstLine.match(/^(.+?)\s*[-–]/) ||
-                firstLine.match(/^([^|\-–(]+)/);
+      firstLine.match(/^(.+?)\s*\|/) ||
+      firstLine.match(/^(.+?)\s*[-–]/) ||
+      firstLine.match(/^([^|\-–(]+)/);
     return match ? match[1].trim() : firstLine.trim();
   };
 
   // Chatbot functionality
   const generateCandidateContext = (candidate) => {
     if (!candidate) return '';
-    
+
     const context = {
       username: candidate.Application?.user?.username || 'Anonymous',
       applicationId: candidate.Application?.id,
@@ -254,7 +254,7 @@ const Leaderboard = () => {
       strengths: candidate.strengths || 'No strengths listed',
       startTime: formatDateTime(candidate.start_time),
       endTime: formatDateTime(candidate.end_time),
-      duration: candidate.start_time && candidate.end_time 
+      duration: candidate.start_time && candidate.end_time
         ? `${Math.round((new Date(candidate.end_time) - new Date(candidate.start_time)) / (1000 * 60))} minutes`
         : 'In Progress',
       questionsPerformance: candidate.session?.map((item, idx) => ({
@@ -278,9 +278,9 @@ const Leaderboard = () => {
       })) || [],
       applicationScore: typeof candidate.Application?.score === 'number' ? candidate.Application.score.toFixed(1) : 'N/A',
       appliedAt: formatDateTime(candidate.Application?.applied_at),
-      shortlistingDecision: candidate.Application?.shortlisting_decision === true ? 'Approved' 
-        : candidate.Application?.shortlisting_decision === false ? 'Rejected' 
-        : 'Pending'
+      shortlistingDecision: candidate.Application?.shortlisting_decision === true ? 'Approved'
+        : candidate.Application?.shortlisting_decision === false ? 'Rejected'
+          : 'Pending'
     };
 
     return JSON.stringify(context, null, 2);
@@ -291,7 +291,7 @@ const Leaderboard = () => {
 
     const userMessage = chatInput.trim();
     setChatInput('');
-    
+
     const newMessages = [...chatMessages, { role: 'user', content: userMessage }];
     setChatMessages(newMessages);
     setIsChatLoading(true);
@@ -332,16 +332,48 @@ Answer questions about this candidate's interview performance, application detai
 
       const data = await response.json();
       const aiMessage = data.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
-      
+
       setChatMessages([...newMessages, { role: 'assistant', content: aiMessage }]);
     } catch (error) {
       console.error('Chat error:', error);
-      setChatMessages([...newMessages, { 
-        role: 'assistant', 
-        content: 'Sorry, I encountered an error processing your request. Please try again.' 
+      setChatMessages([...newMessages, {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error processing your request. Please try again.'
       }]);
     } finally {
       setIsChatLoading(false);
+    }
+  };
+
+  const handlePublishResult = async (sessionId) => {
+    try {
+      const token = getAuthToken();
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(
+        `${API_URL}/interview/publish-result/${sessionId}/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Update local state to show it's published
+        setLeaderboardData(prevData =>
+          prevData.map(item =>
+            item.id === sessionId ? { ...item, is_published: true } : item
+          )
+        );
+        alert("Results published successfully!");
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to publish: ${errorData.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      alert(`Error publishing result: ${err.message}`);
     }
   };
 
@@ -361,14 +393,14 @@ Answer questions about this candidate's interview performance, application detai
   // Filter and search logic
   const filteredData = leaderboardData.filter(candidate => {
     const matchesStatus = filterStatus === 'all' || candidate.status === filterStatus;
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       candidate.Application?.user?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       candidate.Application?.id?.toString().includes(searchTerm);
     return matchesStatus && matchesSearch;
   });
 
   const sortedData = [...filteredData].sort((a, b) => getEffectiveScore(b) - getEffectiveScore(a));
-console.log("Sorted Data:", sortedData);
+  console.log("Sorted Data:", sortedData);
   // Chart configurations with interactive tooltips
   const chartOptions = {
     responsive: true,
@@ -493,7 +525,7 @@ console.log("Sorted Data:", sortedData);
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 text-gray-900">
       <Header viewerType="owner" />
       <div className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        
+
         {/* Dashboard Header */}
         <div className={`transform transition-all duration-1000 ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 mb-8 overflow-hidden">
@@ -514,7 +546,7 @@ console.log("Sorted Data:", sortedData);
                 </div>
               </div>
             </div>
-            
+
             {/* Quick Stats */}
             <div className="px-8 py-6 bg-gray-50 grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center">
@@ -541,7 +573,7 @@ console.log("Sorted Data:", sortedData);
                 </div>
                 <p className="text-sm text-gray-600">Avg Score</p>
                 <p className="text-xl font-bold text-gray-900">
-                  {leaderboardData.length > 0 
+                  {leaderboardData.length > 0
                     ? (leaderboardData.reduce((sum, c) => sum + getEffectiveScore(c), 0) / leaderboardData.length).toFixed(1)
                     : '0.0'
                   }
@@ -553,7 +585,7 @@ console.log("Sorted Data:", sortedData);
                 </div>
                 <p className="text-sm text-gray-600">Top Score</p>
                 <p className="text-xl font-bold text-gray-900">
-                  {leaderboardData.length > 0 
+                  {leaderboardData.length > 0
                     ? Math.max(...leaderboardData.map(c => getEffectiveScore(c))).toFixed(1)
                     : '0.0'
                   }
@@ -621,7 +653,7 @@ console.log("Sorted Data:", sortedData);
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {sortedData.map((candidate, index) => (
-                  
+
                       <tr
                         key={candidate.id}
                         className={`hover:bg-gray-50 transition-colors ${index < 3 ? "bg-gradient-to-r from-yellow-50/50 to-transparent" : ""}`}
@@ -687,25 +719,36 @@ console.log("Sorted Data:", sortedData);
                           </div>
                         </td> */}
                         <td className="px-6 py-4 whitespace-nowrap">
-  <div className="flex gap-2">
-    <button
-      onClick={() => handleViewDetails(candidate)}
-      className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200 hover:border-blue-300"
-    >
-      <Eye className="w-4 h-4" />
-    </button>
-    <button
-      onClick={() => handleViewApplication(candidate.Application)}
-      className="text-green-600 hover:text-green-800 p-2 hover:bg-green-50 rounded-lg transition-colors border border-green-200 hover:border-green-300"
-    >
-      <FileText className="w-4 h-4" />
-    </button>
-    {/* Access the first image from the images array */}
-    {candidate.images && candidate.images.length > 0 && (
-      <ImageModal image={candidate.images[0]} />
-    )}
-  </div>
-</td>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleViewDetails(candidate)}
+                              className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200 hover:border-blue-300"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleViewApplication(candidate.Application)}
+                              className="text-green-600 hover:text-green-800 p-2 hover:bg-green-50 rounded-lg transition-colors border border-green-200 hover:border-green-300"
+                            >
+                              <FileText className="w-4 h-4" />
+                            </button>
+                            {/* Access the first image from the images array */}
+                            {candidate.images && candidate.images.length > 0 && (
+                              <ImageModal image={candidate.images[0]} />
+                            )}
+                            <button
+                              onClick={() => handlePublishResult(candidate.id)}
+                              disabled={candidate.is_published}
+                              className={`p-2 rounded-lg transition-colors border ${candidate.is_published
+                                  ? "text-green-600 bg-green-50 border-green-200 cursor-not-allowed"
+                                  : "text-purple-600 hover:text-purple-800 hover:bg-purple-50 border-purple-200 hover:border-purple-300"
+                                }`}
+                              title={candidate.is_published ? "Results Published" : "Publish Results"}
+                            >
+                              {candidate.is_published ? <CheckCircle className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -733,12 +776,12 @@ console.log("Sorted Data:", sortedData);
                 </button>
               </div>
             </div>
-            
+
             {showChartsSection && (
               <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Performance Distribution Chart */}
                 <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow cursor-pointer group"
-                     onClick={() => setSelectedChart(selectedChart === 'performance' ? null : 'performance')}>
+                  onClick={() => setSelectedChart(selectedChart === 'performance' ? null : 'performance')}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                       Performance Distribution
@@ -746,12 +789,12 @@ console.log("Sorted Data:", sortedData);
                     <Info className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
                   </div>
                   <div className="h-64">
-                    <Bar data={performanceDistributionData} options={{...chartOptions, onClick: () => setSelectedChart('performance')}} />
+                    <Bar data={performanceDistributionData} options={{ ...chartOptions, onClick: () => setSelectedChart('performance') }} />
                   </div>
                   {selectedChart === 'performance' && (
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <p className="text-sm text-blue-800">
-                        <strong>Insight:</strong> This chart shows how candidates are distributed across different score ranges. 
+                        <strong>Insight:</strong> This chart shows how candidates are distributed across different score ranges.
                         Higher concentrations in the 80-100 range indicate strong candidate quality.
                       </p>
                     </div>
@@ -760,7 +803,7 @@ console.log("Sorted Data:", sortedData);
 
                 {/* Skills Comparison Chart */}
                 <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow cursor-pointer group"
-                     onClick={() => setSelectedChart(selectedChart === 'skills' ? null : 'skills')}>
+                  onClick={() => setSelectedChart(selectedChart === 'skills' ? null : 'skills')}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
                       Skills Comparison
@@ -768,12 +811,12 @@ console.log("Sorted Data:", sortedData);
                     <Info className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" />
                   </div>
                   <div className="h-64">
-                    <Doughnut data={skillsComparisonData} options={{...chartOptions, onClick: () => setSelectedChart('skills')}} />
+                    <Doughnut data={skillsComparisonData} options={{ ...chartOptions, onClick: () => setSelectedChart('skills') }} />
                   </div>
                   {selectedChart === 'skills' && (
                     <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
                       <p className="text-sm text-green-800">
-                        <strong>Insight:</strong> Compare average performance across different evaluation criteria. 
+                        <strong>Insight:</strong> Compare average performance across different evaluation criteria.
                         Identify which areas candidates excel in and which need improvement.
                       </p>
                     </div>
@@ -782,7 +825,7 @@ console.log("Sorted Data:", sortedData);
 
                 {/* Interview Status Chart */}
                 <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow cursor-pointer group"
-                     onClick={() => setSelectedChart(selectedChart === 'status' ? null : 'status')}>
+                  onClick={() => setSelectedChart(selectedChart === 'status' ? null : 'status')}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
                       Interview Progress
@@ -790,12 +833,12 @@ console.log("Sorted Data:", sortedData);
                     <Info className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" />
                   </div>
                   <div className="h-64">
-                    <Pie data={interviewStatusData} options={{...chartOptions, onClick: () => setSelectedChart('status')}} />
+                    <Pie data={interviewStatusData} options={{ ...chartOptions, onClick: () => setSelectedChart('status') }} />
                   </div>
                   {selectedChart === 'status' && (
                     <div className="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
                       <p className="text-sm text-purple-800">
-                        <strong>Insight:</strong> Track the overall progress of your interview process. 
+                        <strong>Insight:</strong> Track the overall progress of your interview process.
                         Monitor completion rates and identify any bottlenecks in the pipeline.
                       </p>
                     </div>
@@ -818,11 +861,10 @@ console.log("Sorted Data:", sortedData);
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setShowChatbot(!showChatbot)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                      showChatbot 
-                        ? 'bg-blue-600 text-white shadow-md' 
-                        : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50'
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${showChatbot
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50'
+                      }`}
                   >
                     <Bot className="w-4 h-4" />
                     AI Assistant
@@ -850,11 +892,10 @@ console.log("Sorted Data:", sortedData);
                         <button
                           key={tab}
                           onClick={() => setActiveTab(tab)}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                            activeTab === tab
-                              ? 'bg-blue-600 text-white shadow-md'
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                          }`}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === tab
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                            }`}
                         >
                           {tab === 'overview' && <LayoutDashboard className="w-4 h-4" />}
                           {tab === 'questions' && <MessageSquare className="w-4 h-4" />}
@@ -1212,11 +1253,10 @@ console.log("Sorted Data:", sortedData);
                               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
                               <div
-                                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                                  msg.role === 'user'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-white text-gray-800 border border-gray-200 shadow-sm'
-                                }`}
+                                className={`max-w-[80%] rounded-2xl px-4 py-3 ${msg.role === 'user'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-white text-gray-800 border border-gray-200 shadow-sm'
+                                  }`}
                               >
                                 {msg.role === 'assistant' && (
                                   <div className="flex items-center gap-2 mb-2">
@@ -1370,17 +1410,15 @@ console.log("Sorted Data:", sortedData);
                     <div className="flex bg-gray-200 rounded-lg p-1">
                       <button
                         onClick={() => setResumeView('extracted')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
-                          resumeView === 'extracted' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                        }`}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${resumeView === 'extracted' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                          }`}
                       >
                         Extracted
                       </button>
                       <button
                         onClick={() => setResumeView('original')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
-                          resumeView === 'original' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                        }`}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${resumeView === 'original' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                          }`}
                       >
                         Original
                       </button>

@@ -371,7 +371,7 @@ const InterviewSession = () => {
     setError(null);
 
     try {
-      const payload = { 
+      const payload = {
         answer: currentAnswer.trim()
       };
 
@@ -404,7 +404,7 @@ const InterviewSession = () => {
 
       // Handle next question - try different possible field names
       const nextQuestion = data.current_question || data.question || data.next_question;
-      
+
       if (nextQuestion) {
         console.log('Setting next question:', nextQuestion);
         setCurrentQuestion(nextQuestion);
@@ -415,14 +415,14 @@ const InterviewSession = () => {
           throw new Error("No next question received and interview not marked as completed");
         }
       }
-      
+
     } catch (err) {
       console.error('=== SUBMISSION ERROR ===');
       console.error('Error:', err);
-      
+
       // Restore answer if submission failed
       setAnswer(currentAnswer);
-      
+
       // Specific error handling
       if (err.message.includes('401') || err.message.includes('Unauthorized')) {
         setError("Session expired. Please log in again.");
@@ -434,7 +434,7 @@ const InterviewSession = () => {
       } else {
         setError(err.message || "Error submitting answer. Please try again.");
       }
-      
+
       // Remove the failed answer from chat history
       setChatHistory(prev => prev.slice(0, -1));
     } finally {
@@ -448,7 +448,7 @@ const InterviewSession = () => {
 
     try {
       console.log('Starting interview session for interview ID:', interviewId);
-      
+
       // Initialize the actual interview session when user clicks start
       const data = await fetchWithToken(
         `${API_URL}/interview/interview-session-initializer/${interviewId}/`,
@@ -472,7 +472,7 @@ const InterviewSession = () => {
       }
       console.log('Setting session ID in context:', data.session_id);
       setSessionId(data.session_id);
-      
+
       // Handle initial question - try different field names
       const initialQuestion = data.question || data.current_question || data.first_question;
       if (initialQuestion) {
@@ -491,7 +491,7 @@ const InterviewSession = () => {
       }
     } catch (err) {
       console.error('Error starting interview:', err);
-      
+
       if (err.message.includes("401") || err.message.includes("Unauthorized")) {
         setError("Unauthorized. Please log in again.");
         navigate("/login");
@@ -654,11 +654,10 @@ const InterviewSession = () => {
             <div className="flex items-center space-x-3">
               <button
                 onClick={toggleSpeech}
-                className={`p-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl ${
-                  speechEnabled
+                className={`p-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl ${speechEnabled
                     ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
                     : 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700'
-                }`}
+                  }`}
                 title={speechEnabled ? 'Disable voice output' : 'Enable voice output'}
                 aria-label={speechEnabled ? 'Disable voice output' : 'Enable voice output'}
               >
@@ -669,11 +668,10 @@ const InterviewSession = () => {
                 <button
                   onClick={replayQuestion}
                   disabled={isListening}
-                  className={`p-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl ${
-                    isListening
+                  className={`p-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl ${isListening
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700'
-                  }`}
+                    }`}
                   title="Replay current question"
                   aria-label="Replay current question"
                 >
@@ -835,13 +833,12 @@ const InterviewSession = () => {
                             <button
                               onClick={toggleListening}
                               disabled={isSpeaking}
-                              className={`p-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl ${
-                                isListening
+                              className={`p-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl ${isListening
                                   ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700'
                                   : isSpeaking
-                                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                  : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'
-                              }`}
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'
+                                }`}
                               title={isListening ? 'Stop listening' : 'Start voice input'}
                               aria-label={isListening ? 'Stop listening' : 'Start voice input'}
                             >
@@ -851,11 +848,10 @@ const InterviewSession = () => {
                           <button
                             onClick={handleNext}
                             disabled={!answer.trim() || questionLoading || isSpeaking}
-                            className={`px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2 ${
-                              !answer.trim() || questionLoading || isSpeaking
+                            className={`px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2 ${!answer.trim() || questionLoading || isSpeaking
                                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 : 'bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800'
-                            }`}
+                              }`}
                             aria-label="Submit answer"
                           >
                             {questionLoading ? (

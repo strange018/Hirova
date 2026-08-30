@@ -49,11 +49,14 @@ export default function ImageUploader({ onUploadSuccess, label = "Upload Image",
         toast.success("Image uploaded successfully!");
         if (onUploadSuccess) onUploadSuccess(imageUrl);
       } else {
-        toast.error("Failed to upload image.");
+        console.error("Pinata upload failed:", data);
+        toast.warning("Pinata upload failed. Using placeholder image for testing.");
+        if (onUploadSuccess) onUploadSuccess("https://via.placeholder.com/150");
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Error uploading image.");
+      console.error("Error uploading image:", err);
+      toast.warning("Error uploading to Pinata. Using placeholder image for testing.");
+      if (onUploadSuccess) onUploadSuccess("https://via.placeholder.com/150");
     } finally {
       setUploading(false);
     }

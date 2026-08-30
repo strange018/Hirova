@@ -37,11 +37,13 @@ class Organization(APIView):
             serializer = OrganizationRegistrationSerializer(data=request.data)
             if serializer.is_valid():
                 orgname = serializer.validated_data.get('orgname')
+                email = serializer.validated_data.get('email')
                 address = serializer.validated_data.get('address')
                 photo = serializer.validated_data.get('photo')
                 description = serializer.validated_data.get('Description')
                 org = organization.objects.create(
                     org=user,
+                    email=email,
                     orgname=orgname,
                     address=address,
                     photo=photo,

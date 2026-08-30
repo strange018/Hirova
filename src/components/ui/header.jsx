@@ -14,7 +14,7 @@ const Header = ({ viewerType: propViewerType }) => {
   const isOrgDashboardPage = location.pathname.startsWith('/org-dashboard');
   const isOrgRegisterPage = location.pathname === '/register-org';
   const isDefaultPage = ['/', '/login', '/signup', '/about'].includes(location.pathname);
-const baseUrl=import.meta.env.VITE_API_URL;
+  const baseUrl = import.meta.env.VITE_API_URL;
   useEffect(() => {
     if (!token) {
       setViewerType('guest');
@@ -116,7 +116,7 @@ const baseUrl=import.meta.env.VITE_API_URL;
                   href={`/org-dashboard/${orgId}`}
                   className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
                 >
-                 go to organization
+                  go to organization
                 </a>
               ) : (
                 <a
@@ -168,8 +168,8 @@ const baseUrl=import.meta.env.VITE_API_URL;
 
           {/* Logout button for authenticated users */}
           {(viewerType === 'owner' || (viewerType === 'authenticated' && hasProfile)) && (
-            <button 
-              onClick={handleLogout} 
+            <button
+              onClick={handleLogout}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Logout
@@ -178,8 +178,8 @@ const baseUrl=import.meta.env.VITE_API_URL;
 
           {/* Sign up button for guests */}
           {viewerType === 'guest' && (
-            <a 
-              href="/signup" 
+            <a
+              href="/signup"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Sign Up

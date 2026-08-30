@@ -53,6 +53,7 @@ class InterviewManager:
         self.follow_up_decider = follow_up_decider
         self.context_prompt = context_prompt
         self.resume_extraction_prompt = resume_extraction_prompt
+        self.resume_question_prompt = resume_question_prompt
 
     
     def final_evaluate_interview(self, req: FinalEvaluationRequest) -> FinalEvaluationResponse:
@@ -204,3 +205,19 @@ class InterviewManager:
             feedback=result.feedback if hasattr(result, 'feedback') else fallback_result.feedback,
             reasoning=result.reasoning if hasattr(result, 'reasoning') else fallback_result.reasoning
         )
+    def generate_resume_question(self, position, experience, resume_text, conversation_context, max_questions=5):
+        """Generates the next interview question based on the resume and context"""
+        
+        try:
+            chain = self.resume_question_prompt | self.llm | JsonOutputParser()
+            result = chain.invoke({
+                "position": position,
+                "experience": experience,
+                "resume_text": resume_text,
+                "conversation_context": "\n".join(conversation_context),
+                "max_questions": max_questions
+            })
+            return result
+        except Exception as e:
+            print(f"Error generating resume question: {e}")
+            return {"question": "Can you tell me more about your most significant technical project?", "completed": False}

@@ -40,7 +40,7 @@ export default function OrgSignup() {
       [e.target.name]: e.target.value,
     }));
   };
-  
+
   // ✅ Step 3: Submit organization registration
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +49,7 @@ export default function OrgSignup() {
 
     try {
       // 🎯 POST to create organization
-      const response = await fetch("${API_URL}/organization/create-org/", {
+      const response = await fetch(`${API_URL}/organization/create-org/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export default function OrgSignup() {
         setError("");
 
         // 🔄 GET organization ID after registration
-        const idRes = await fetch("${API_URL}/organization/get-org-id/", {
+        const idRes = await fetch(`${API_URL}/organization/get-org-id/`, {
           method: "GET",
           headers: {
             Authorization: `Token ${token}`,
@@ -170,9 +170,8 @@ export default function OrgSignup() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-purple-600 hover:bg-purple-700 transition-colors p-3 rounded font-semibold text-lg ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`w-full bg-purple-600 hover:bg-purple-700 transition-colors p-3 rounded font-semibold text-lg ${loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
             >
               {loading ? "Registering..." : "Submit"}
             </button>

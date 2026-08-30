@@ -40,27 +40,27 @@ const ResumeQuestionSession = () => {
   // Improved helper function to handle API responses
   const handleResponse = (data) => {
     console.log('📥 Handling API response:', data);
-    
+
     // Better validation of response data
     if (!data) {
       throw new Error('Empty response from server');
     }
-    
+
     if (typeof data !== 'object') {
       throw new Error('Invalid response format from server');
     }
-    
+
     // Check for error in response
     if (data.error) {
       throw new Error(data.error);
     }
-    
+
     // Handle completion - check both 'completed' and 'compeletd' (typo in backend)
     if (data.completed === true || data.compeletd === true) {
       console.log('✅ Session completed');
       return { completed: true };
     }
-    
+
     // For ongoing session, ensure we have a question
     if (data.completed === false) {
       if (!data.question) {
@@ -69,7 +69,7 @@ const ResumeQuestionSession = () => {
       console.log('❓ New question received:', data.question.substring(0, 100) + '...');
       return { completed: false, question: data.question };
     }
-    
+
     // If we reach here, response format is unexpected
     throw new Error('Unexpected response format from server');
   };
@@ -80,25 +80,25 @@ const ResumeQuestionSession = () => {
     console.log('🔑 Token available:', !!token);
     console.log('📝 Session ID:', sessionId);
     console.log('🌐 API URL:', API_URL);
-    
+
     if (!token) {
       console.log('❌ No token found, redirecting to login');
       navigate("/login");
       return;
     }
-    
+
     if (!sessionId) {
       console.log('❌ No session ID found');
       setError('Session ID is missing. Please try again.');
       setLoading(false);
       return;
     }
-    
+
     if (hasInitialized.current) {
       console.log('⚠️ Already initialized, skipping');
       return;
     }
-    
+
     hasInitialized.current = true;
 
     const initSession = async () => {
@@ -106,14 +106,14 @@ const ResumeQuestionSession = () => {
         const endpoint = `${API_URL}/interview/res-question/${sessionId}/`;
         // Send empty object for initial request
         const requestBody = {};
-        
+
         console.log('🚀 Making initialization request...');
         logApiCall('POST', endpoint, requestBody);
-        
+
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Token ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestBody)
@@ -121,11 +121,11 @@ const ResumeQuestionSession = () => {
 
         console.log('📡 Response status:', response.status);
         console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
-        
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error('❌ HTTP Error Response:', errorText);
-          
+
           if (response.status === 401) {
             throw new Error('Authentication failed. Please log in again.');
           } else if (response.status === 404) {
@@ -157,7 +157,7 @@ const ResumeQuestionSession = () => {
           stack: err.stack,
           name: err.name
         });
-        
+
         // More specific error handling
         if (err.message?.includes('401') || err.message?.includes('Authentication')) {
           setError('Your session has expired. Please log in again.');
@@ -209,18 +209,18 @@ const ResumeQuestionSession = () => {
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Token ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody)
       });
 
       console.log('📡 Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ HTTP Error Response:', errorText);
-        
+
         if (response.status === 401) {
           throw new Error('Authentication failed. Please log in again.');
         } else if (response.status === 404) {
@@ -253,10 +253,10 @@ const ResumeQuestionSession = () => {
         stack: err.stack,
         name: err.name
       });
-      
+
       // Restore the answer if submission failed
       setAnswer(submittedAnswer);
-      
+
       // Specific error handling
       if (err.message?.includes('401') || err.message?.includes('Authentication')) {
         setError("Your session has expired. Please log in again.");
@@ -282,7 +282,7 @@ const ResumeQuestionSession = () => {
     if (completed) {
       console.log('🎉 Session completed, redirecting in 3 seconds...');
       setTimeout(() => {
-      navigate(sessionId ? `/dsa-interview-platform/${sessionId}` : "/");
+        navigate(sessionId ? `/dsa-interview-platform/${sessionId}` : "/");
       }, 3000);
     }
   }, [completed, navigate]);
@@ -325,7 +325,7 @@ const ResumeQuestionSession = () => {
             <MessageCircle className="w-8 h-8 text-red-500" />
           </div>
           <p className="text-xl font-semibold text-red-600 mb-4">{error}</p>
-          
+
           {/* Debug Information */}
           <div className="text-left bg-gray-50 p-4 rounded-lg mb-4 text-sm">
             <h4 className="font-semibold mb-2">Debug Information:</h4>
@@ -335,7 +335,7 @@ const ResumeQuestionSession = () => {
             <p>• Current Time: {new Date().toLocaleString()}</p>
             <p>• User Agent: {navigator.userAgent.substring(0, 50)}...</p>
           </div>
-          
+
           <div className="space-y-3">
             <button
               onClick={() => {
@@ -541,16 +541,16 @@ const ResumeQuestionSession = () => {
                         </h3>
                       </div>
                     </div>
-                    
+
                     {/* Question Display */}
                     <div className="mb-8 h-32">
                       <div className="h-full p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50 overflow-y-auto">
                         <p className="text-xl text-blue-800 leading-relaxed font-medium">
                           {currentQuestion}
                         </p>
-                      </div> 
+                      </div>
                     </div>
-                    
+
                     {/* Answer Input Section */}
                     <div className="space-y-6">
                       <div className="relative">
@@ -567,31 +567,30 @@ const ResumeQuestionSession = () => {
                           {answer.length}/5000
                         </div>
                       </div>
-                      
+
                       {/* Error Display */}
                       {error && (
                         <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                           <p className="text-red-700 text-sm">{error}</p>
                         </div>
                       )}
-                      
+
                       {/* Action Buttons */}
                       <div className="flex justify-end space-x-4">
                         <button
                           onClick={handleNext}
                           disabled={!answer.trim() || questionLoading}
-                          className={`px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2 ${
-                            !answer.trim() || questionLoading
-                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800'
-                          }`}
+                          className={`px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2 ${!answer.trim() || questionLoading
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800'
+                            }`}
                           aria-label="Submit answer"
                           title={
                             !answer.trim()
                               ? 'Please provide an answer first'
                               : questionLoading
-                              ? 'Processing your previous answer'
-                              : 'Submit answer (Ctrl+Enter)'
+                                ? 'Processing your previous answer'
+                                : 'Submit answer (Ctrl+Enter)'
                           }
                         >
                           {questionLoading ? (
@@ -607,7 +606,7 @@ const ResumeQuestionSession = () => {
                           )}
                         </button>
                       </div>
-                      
+
                       {/* Keyboard Shortcuts Help */}
                       {!questionLoading && (
                         <div className="text-center text-blue-400 text-sm">

@@ -15,6 +15,7 @@ from utils.ResumeExtractor import ResumeExtractor
 from utils.Evaluator import Evaluator
 from utils.FinalEvaluator import FinalEvaluator
 from utils.FollowUpdecider import FollowUpDecider
+from utils.agent import InterviewManager
 import requests
 from PyPDF2 import PdfReader
 from django.core.files.base import ContentFile
@@ -500,3 +501,100 @@ class SessionDsaQuestions(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "DSA interaction created", "id": dsa_interaction.id}, status=status.HTTP_201_CREATED)
+class ResumeQuestionView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, id):
+        try:
+            session = InterviewSession.objects.get(id=id)
+        except InterviewSession.DoesNotExist:
+            return Response({"error": "Interview session not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user != session.Application.user:
+            return Response({"error": "You do not have permission to access this session."}, status=status.HTTP_403_FORBIDDEN)
+
+        application = session.Application
+        interview = application.interview
+        resume_text = application.extratedResume
+
+        if not resume_text:
+            return Response({"error": "Resume text not found. Please re-upload your resume."}, status=status.HTTP_400_BAD_REQUEST)
+
+        MAX_QUESTIONS = 3
+
+        # Get or create resume conversation
+        convo, created = resumeconvo.objects.get_or_create(Application=application)
+
+        # Get previous questions/answers
+        previous_qs = resquestions.objects.filter(convo=convo).order_by('created_at')
+        conversation_context = []
+        for q in previous_qs:
+            conversation_context.append(f"Q: {q.question}")
+            if q.user and q.user != "":
+                conversation_context.append(f"A: {q.user}")
+
+        answer = request.data.get("answer")
+
+        if answer:
+            # Save answer to the last unanswered question
+            last_q = previous_qs.last()
+            if last_q:
+                last_q.user = answer
+                last_q.save()
+                # Update conversation context for the generator
+                if conversation_context and conversation_context[-1].startswith("Q:"):
+                    conversation_context.append(f"A: {answer}")
+
+        # Count questions that have been answered (i.e. have a user response)
+        answered_count = resquestions.objects.filter(convo=convo).exclude(user="").exclude(user__isnull=True).count()
+
+        # Enforce max questions limit deterministically — don't rely on the LLM to count
+        if answered_count >= MAX_QUESTIONS:
+            return Response({"completed": True}, status=status.HTTP_200_OK)
+
+        # Generate next question via LLM
+        manager = InterviewManager()
+        result = manager.generate_resume_question(
+            position=interview.post,
+            experience=interview.experience,
+            resume_text=resume_text,
+            conversation_context=conversation_context,
+            max_questions=MAX_QUESTIONS
+        )
+
+        # Guard: if LLM says completed OR we already have enough questions in DB, stop
+        total_qs = resquestions.objects.filter(convo=convo).count()
+        if result.get("completed") or total_qs >= MAX_QUESTIONS:
+            return Response({"completed": True}, status=status.HTTP_200_OK)
+
+        # Save new question
+        new_q = resquestions.objects.create(
+            convo=convo,
+            question=result.get("question", "Could you tell me more about your experience?")
+        )
+
+        return Response({
+            "completed": False,
+            "question": new_q.question
+        }, status=status.HTTP_200_OK)
+
+
+class PublishResultView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, session_id):
+        try:
+            session = InterviewSession.objects.get(id=session_id)
+            # Ensure the user belongs to the organization that created the interview
+            if request.user != session.Application.interview.org.org:
+                 return Response({"error": "You do not have permission to publish results for this interview."}, status=status.HTTP_403_FORBIDDEN)
+            
+            session.is_published = True
+            session.save()
+            return Response({"success": True, "message": "Results published successfully!"})
+        except InterviewSession.DoesNotExist:
+            return Response({"error": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

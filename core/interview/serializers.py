@@ -128,11 +128,14 @@ class InterviewSerializer(serializers.ModelSerializer):
     has_applied = serializers.SerializerMethodField()
     application_status = serializers.SerializerMethodField()
     attempted = serializers.SerializerMethodField()
+    results = serializers.SerializerMethodField()
+
     class Meta:
         model = Custominterviews
         fields = [
             "id", "desc", "post", "experience", "submissionDeadline",
-            "startTime", "endTime", "has_applied","application_status","attempted",
+            "startTime", "endTime", "has_applied", "application_status", "attempted",
+            "results"
         ]
 
     def get_has_applied(self, obj):
@@ -146,6 +149,7 @@ class InterviewSerializer(serializers.ModelSerializer):
                 interview=obj
             ).exists()
         return False
+
     def get_application_status(self, obj):
         """
         Returns the application status for the authenticated user.
@@ -161,6 +165,7 @@ class InterviewSerializer(serializers.ModelSerializer):
             except Application.DoesNotExist:
                 return False
         return False
+
     def get_attempted(self, obj):
         """
         Checks if the authenticated user has attempted this interview.
@@ -172,6 +177,35 @@ class InterviewSerializer(serializers.ModelSerializer):
                 Application__interview=obj
             ).exists()
         return False
+
+    def get_results(self, obj):
+        """
+        Returns the score and feedback for the authenticated user's session.
+        """
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            try:
+                session = InterviewSession.objects.filter(
+                    Application__user=request.user,
+                    Application__interview=obj
+                ).latest('start_time')
+                
+                if session.is_published:
+                    return {
+                        "score": session.score,
+                        "feedback": session.feedback,
+                        "recommendation": session.recommendation,
+                        "status": session.status,
+                        "is_published": True
+                    }
+                else:
+                    return {
+                        "is_published": False,
+                        "status": session.status
+                    }
+            except InterviewSession.DoesNotExist:
+                return None
+        return None
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -251,6 +285,7 @@ class LeaderBoardSerializer(serializers.ModelSerializer):
             "score",
             "recommendation",
             "strengths",
+            "is_published",
             "Application",
             "user",
             "session",

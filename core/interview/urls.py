@@ -13,8 +13,10 @@ urlpatterns = [
     path('update-application/<int:id>/',views.ApplicationView.as_view(),name='update_appliation'),
     path('interview-session-initializer/<int:id>/', views.InterviewSessionInitializerView.as_view(), name='interview_session_initializer'),
     path('leaderboard/<int:id>/',views.LeaderBoardView.as_view(), name='leaderboard'),
-    path('cheated/<int:id>/',views.CheatingDetection.as_view(),name="cheating_updater"),
+    path('check-cheating/<int:session_id>/', views.CheatingDetection.as_view(), name='check_cheating'),
+    path('publish-result/<int:session_id>/', views.PublishResultView.as_view(), name='publish_result'),
     path('get-dsa-questions/<int:id>/', views.SessionDsaQuestions.as_view(), name='get_dsa_questions'),
     path('add-dsa-scores/<int:id>/<int:dsa_id>/',views.SessionDsaQuestions.as_view(), name='add_dsa_scores'),
+    path('res-question/<int:id>/', views.ResumeQuestionView.as_view(), name='resume_question_session'),
 
 ]

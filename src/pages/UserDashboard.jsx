@@ -101,25 +101,25 @@
 // //   const handleResumeUpload = async (e, interviewId) => {
 // //     const file = e.target.files[0];
 // //     if (!file) return;
-  
+
 // //     // Check file type
 // //     if (file.type !== "application/pdf") {
 // //       toast.error("Please upload a PDF file only.");
 // //       return;
 // //     }
-  
+
 // //     // Check file size (e.g., max 5MB)
 // //     if (file.size > 5 * 1024 * 1024) {
 // //       toast.error("File size should not exceed 5MB.");
 // //       return;
 // //     }
-  
+
 // //     setUploadingResume(prev => ({ ...prev, [interviewId]: true }));
-  
+
 // //     // Upload directly to Pinata
 // //     const formData = new FormData();
 // //     formData.append("file", file);
-    
+
 // //     // Optional: Add metadata
 // //     const metadata = JSON.stringify({
 // //       name: `resume_${interviewId}_${file.name}`,
@@ -129,12 +129,12 @@
 // //       }
 // //     });
 // //     formData.append("pinataMetadata", metadata);
-  
+
 // //     const options = JSON.stringify({
 // //       cidVersion: 1,
 // //     });
 // //     formData.append("pinataOptions", options);
-  
+
 // //     try {
 // //       const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
 // //         method: "POST",
@@ -144,20 +144,20 @@
 // //         },
 // //         body: formData,
 // //       });
-  
+
 // //       const data = await res.json();
-      
+
 // //       if (res.ok && data.IpfsHash) {
 // //         const fileUrl = `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`;
-        
+
 // //         // Store the file URL in your state
 // //         setResumeFiles((prev) => ({
 // //           ...prev,
 // //           [interviewId]: fileUrl
 // //         }));
-        
+
 // //         toast.success("Resume uploaded successfully!");
-        
+
 // //       } else {
 // //         toast.error("Failed to upload resume.");
 // //       }
@@ -272,7 +272,7 @@
 // //               </div>
 // //             )}
 // //           </div>
-          
+
 // //           <button
 // //             onClick={() => handleApply(interviewId)}
 // //             disabled={!resumeUploaded || isUploading || isApplying}
@@ -842,7 +842,7 @@
 //   }
 
 //   return (
-  
+
 
 //      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-white text-gray-800 relative overflow-hidden">
 //       <Header viewerType={viewerType} />
@@ -1038,7 +1038,7 @@
 //       <Footer />
 //     </div>
 
-    
+
 //   );
 // }
 
@@ -1142,7 +1142,7 @@ export default function UserDashboard() {
     }
   };
 
-  // Fixed: Upload resume and store both CID and URL
+  // Fixed: Upload resume using Pinata v3 Files API
   const handleResumeUpload = async (e, interviewId) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -1160,21 +1160,11 @@ export default function UserDashboard() {
     setUploadingResume(prev => ({ ...prev, [interviewId]: true }));
 
     const form = new FormData();
-    form.append("file", file);
-
-    const metadata = JSON.stringify({
-      name: `resume_${interviewId}_${file.name}`,
-      keyvalues: {
-        interview_id: interviewId,
-        uploaded_at: new Date().toISOString()
-      }
-    });
-
-    form.append("pinataMetadata", metadata);
-    form.append("pinataOptions", JSON.stringify({ cidVersion: 1 }));
+    form.append("file", file, `resume_${interviewId}_${file.name}`);
+    form.append("network", "public");
 
     try {
-      const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+      const res = await fetch("https://uploads.pinata.cloud/v3/files", {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_PINATA_JWT_TOKEN}`,
@@ -1184,11 +1174,10 @@ export default function UserDashboard() {
 
       const data = await res.json();
 
-      if (res.ok && data.IpfsHash) {
-        const cid = data.IpfsHash;
-        const url = `https://gateway.pinata.cloud/ipfs/${cid}`;
+      if (res.ok && data?.data?.cid) {
+        const cid = data.data.cid;
+        const url = `https://ipfs.io/ipfs/${cid}`;
 
-        // Store both CID and URL
         setResumeData(prev => ({
           ...prev,
           [interviewId]: { cid, url }
@@ -1196,14 +1185,17 @@ export default function UserDashboard() {
 
         toast.success("Resume uploaded successfully!");
       } else {
-        toast.error("Failed to upload resume.");
+        console.error("Pinata upload failed:", data);
+        toast.error("Failed to upload resume to Pinata. Please try again.");
       }
     } catch (err) {
-      toast.error("Error uploading resume.");
+      console.error("Error uploading resume:", err);
+      toast.error("Network error while uploading resume. Please try again.");
     } finally {
       setUploadingResume(prev => ({ ...prev, [interviewId]: false }));
     }
   };
+
 
   // Fixed: Apply using the appropriate field based on backend expectation
   const handleApply = async (interviewId) => {
@@ -1227,9 +1219,9 @@ export default function UserDashboard() {
             "Content-Type": "application/json",
             Authorization: `Token ${token}`,
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             resume_cid: resume.cid,
-            resume_url: resume.url 
+            resume_url: resume.url
           }),
         }
       );
@@ -1265,10 +1257,43 @@ export default function UserDashboard() {
     if (hasApplied) {
       if (applicationStatus) {
         if (hasAttempted) {
+          const results = interview.results;
           return (
-            <div className="mt-2 flex items-center gap-2 text-green-600">
-              <CheckCircle className="w-4 h-4" />
-              <p>Your result will be announced soon.</p>
+            <div className="mt-2 space-y-3">
+              <div className="flex items-center gap-2 text-green-600 font-semibold">
+                <CheckCircle className="w-5 h-5" />
+                <p>Interview Completed</p>
+              </div>
+
+              {results && results.is_published ? (
+                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-blue-700 font-medium text-sm text-uppercase">Overall Score</span>
+                    <span className="text-2xl font-bold text-blue-800">{results.score ?? 0}/10</span>
+                  </div>
+
+                  {results.recommendation && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-gray-600">Decision:</span>
+                      <span className={`font-bold ${results.recommendation === 'HIRE' ? 'text-green-600' : results.recommendation === 'REJECT' ? 'text-red-600' : 'text-orange-600'}`}>
+                        {results.recommendation}
+                      </span>
+                    </div>
+                  )}
+
+                  {results.feedback && (
+                    <div className="mt-2 text-sm text-gray-700">
+                      <p className="font-medium text-blue-700 mb-1">Feedback:</p>
+                      <p className="italic leading-relaxed">"{results.feedback}"</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-orange-600 text-sm">
+                  <Clock className="w-4 h-4" />
+                  <p>Your result will be announced soon.</p>
+                </div>
+              )}
             </div>
           );
         } else {
@@ -1324,11 +1349,10 @@ export default function UserDashboard() {
           <button
             onClick={() => handleApply(interviewId)}
             disabled={!resumeUploaded || isUploading || isApplying}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-              !resumeUploaded || isUploading || isApplying
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
-            }`}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${!resumeUploaded || isUploading || isApplying
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
           >
             {isApplying ? (
               <>
@@ -1464,7 +1488,7 @@ export default function UserDashboard() {
                       {githubUsername && (
                         <div className="mt-4 rounded-xl overflow-hidden">
                           <img
-                            src={`https://github-readme-stats.vercel.app/api?username=${githubUsername}&show_icons=true&theme=default`}
+                            src={`https://github-readme-stats-sigma-five.vercel.app/api?username=${githubUsername}&show_icons=true&theme=default`}
                             alt="GitHub Stats"
                             className="w-full object-cover"
                           />

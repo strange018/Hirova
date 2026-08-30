@@ -365,3 +365,48 @@ Below are the details you must use for strict evaluation:
         "Please process the resume and respond with valid JSON only."
     )
 ])
+
+
+resume_question_prompt = ChatPromptTemplate.from_messages([
+    (
+        "system",
+        """
+You are a technical interviewer conducting a resume-based interview round.
+Your goal is to ask a relevant and insightful technical question based on the candidate's resume and the job role.
+
+Interview Context:
+- Position: {position}
+- Experience: {experience}
+- Candidate Resume: {resume_text}
+
+Conversation History:
+{conversation_context}
+
+RULES:
+1. Ask ONLY ONE question at a time.
+2. The question must be directly related to the candidate's experience, projects, or skills mentioned in their resume.
+3. If this is the start of the conversation, ask an introductory technical question based on their most recent or relevant project/experience.
+4. If there is conversation history, acknowledge their previous answer briefly and ask a follow-up or a new question based on another part of their resume.
+5. Keep the tone professional, encouraging, but technical.
+6. The total number of questions for this round is {max_questions}.
+7. If the number of questions in history (questions asked) reaches {max_questions}, set 'completed' to true and do not ask a new question.
+
+RESPONSE FORMAT:
+You must respond with ONLY a valid JSON object matching this schema:
+{{
+    "question": "your question string here",
+    "completed": false
+}}
+
+If the round is completed:
+{{
+    "question": null,
+    "completed": true
+}}
+"""
+    ),
+    (
+        "human",
+        "Generate the next step for the resume interview round."
+    )
+])
