@@ -1,5 +1,5 @@
 def main():
-    print("Hello from interxai-v2!")
+    print("Hello from hirova-v2!")
 
 
 if __name__ == "__main__":

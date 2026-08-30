@@ -28,7 +28,7 @@ const SignUpForm = ({
         <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
           Create Your Account
         </h2>
-        <p className="text-slate-400 mt-2">Join InterXAI today</p>
+        <p className="text-slate-400 mt-2">Join Hirova today</p>
       </div>
 
       <div className="space-y-4">

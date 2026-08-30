@@ -129,7 +129,7 @@ const About = () => {
             </h1>
             
             <p className="text-2xl text-gray-200 mb-12 leading-relaxed max-w-4xl">
-              InterXAI bridges the gap between traditional interview preparation and real-world hiring processes. 
+              Hirova bridges the gap between traditional interview preparation and real-world hiring processes. 
               Our AI-powered platform provides personalized recruitment experiences for both candidates and employers.
             </p>
 
@@ -329,7 +329,7 @@ const About = () => {
             <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 backdrop-blur-sm rounded-3xl p-12 border border-purple-500/20">
               <h3 className="text-4xl font-bold text-white mb-6">Ready to Transform Your Career?</h3>
               <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                Join thousands of professionals who have already elevated their interview skills and landed their dream jobs with InterXAI.
+                Join thousands of professionals who have already elevated their interview skills and landed their dream jobs with Hirova.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">

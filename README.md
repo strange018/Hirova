@@ -1,6 +1,6 @@
-# InterXAI - AI-Powered Interview Automation System
+# Hirova - AI-Powered Interview Automation System
 
-![InterXAI Architecture](https://img.shields.io/badge/InterXAI-AI%20Interview%20Platform-blue?style=for-the-badge)
+![Hirova Architecture](https://img.shields.io/badge/Hirova-AI%20Interview%20Platform-blue?style=for-the-badge)
 ![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
@@ -24,7 +24,7 @@
 
 ## Overview
 
-**InterXAI** is a cutting-edge AI-powered interview automation system that revolutionizes the recruitment process by enabling organizations to conduct intelligent, real-time interviews with advanced monitoring capabilities. The platform seamlessly integrates Large Language Models (Meta LLaMA via LangChain) with computer vision monitoring (OpenCV) to ensure fairness, prevent cheating, and provide adaptive question generation based on candidate responses.
+**Hirova** is a cutting-edge AI-powered interview automation system that revolutionizes the recruitment process by enabling organizations to conduct intelligent, real-time interviews with advanced monitoring capabilities. The platform seamlessly integrates Large Language Models (Meta LLaMA via LangChain) with computer vision monitoring (OpenCV) to ensure fairness, prevent cheating, and provide adaptive question generation based on candidate responses.
 
 ### Key Highlights
 
@@ -58,13 +58,13 @@
 
 ## System Architecture
 
-InterXAI follows a **microservices-inspired, event-driven architecture** designed for scalability, reliability, and performance.
+Hirova follows a **microservices-inspired, event-driven architecture** designed for scalability, reliability, and performance.
 
 ### Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    InterXAI System Architecture             │
+│                    Hirova System Architecture             │
 ├─────────────────────────────────────────────────────────────┤
 │  Frontend (React + OpenCV)                                  │
 │  ├── Candidate Interface                                    │
@@ -154,8 +154,8 @@ InterXAI follows a **microservices-inspired, event-driven architecture** designe
 1. **Backend Setup**
    ```bash
    # Clone and navigate
-   git clone https://github.com/yourorg/interxai.git
-   cd interxai/backend
+   git clone https://github.com/yourorg/hirova.git
+   cd hirova/backend
    
    # Create virtual environment
    python -m venv venv
@@ -202,8 +202,8 @@ Create a `.env` file in the root directory:
 
 ```bash
 # Database Configuration
-DATABASE_NAME=interxai_db
-DATABASE_USER=interxai_user
+DATABASE_NAME=hirova_db
+DATABASE_USER=hirova_user
 DATABASE_PASSWORD=your_secure_password
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
@@ -361,7 +361,7 @@ graph TD
 
 ### Authentication Architecture
 
-InterXAI implements a **token-based authentication system** using Django REST Framework (DRF) across all microservices. This ensures secure, scalable, and stateless authentication suitable for distributed systems.
+Hirova implements a **token-based authentication system** using Django REST Framework (DRF) across all microservices. This ensures secure, scalable, and stateless authentication suitable for distributed systems.
 
 #### Token Authentication Flow
 1. **User Authentication**: Clients authenticate with credentials
@@ -511,7 +511,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'interxai.log',
+            'filename': 'hirova.log',
         },
         'console': {
             'level': 'DEBUG',
@@ -527,7 +527,7 @@ LOGGING = {
 
 ## Contributing
 
-We welcome contributions to InterXAI! Please follow these guidelines:
+We welcome contributions to Hirova! Please follow these guidelines:
 
 ### Development Setup
 
@@ -593,12 +593,12 @@ We welcome contributions to InterXAI! Please follow these guidelines:
 
 ## License
 
-InterXAI is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+Hirova is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ```text
 MIT License
 
-Copyright (c) 2025 InterXAI Team
+Copyright (c) 2025 Hirova Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -623,30 +623,30 @@ SOFTWARE.
 
 ### Documentation and Resources
 
-- **Official Documentation**: [https://docs.interxai.com](https://docs.interxai.com)
-- **API Reference**: [https://api-docs.interxai.com](https://api-docs.interxai.com)
-- **Video Tutorials**: [https://tutorials.interxai.com](https://tutorials.interxai.com)
-- **Community Forum**: [https://community.interxai.com](https://community.interxai.com)
+- **Official Documentation**: [https://docs.hirova.com](https://docs.hirova.com)
+- **API Reference**: [https://api-docs.hirova.com](https://api-docs.hirova.com)
+- **Video Tutorials**: [https://tutorials.hirova.com](https://tutorials.hirova.com)
+- **Community Forum**: [https://community.hirova.com](https://community.hirova.com)
 
 ### Getting Help
 
 #### For Technical Issues
 - **GitHub Issues**: Report bugs and feature requests
-- **Stack Overflow**: Tag questions with `interxai`
+- **Stack Overflow**: Tag questions with `hirova`
 - **Discord Community**: Join our developer community
-- **Email Support**: technical-support@interxai.com
+- **Email Support**: technical-support@hirova.com
 
 #### For Business Inquiries
-- **Sales Team**: sales@interxai.com
-- **Partnership Opportunities**: partnerships@interxai.com
-- **Enterprise Support**: enterprise@interxai.com
+- **Sales Team**: sales@hirova.com
+- **Partnership Opportunities**: partnerships@hirova.com
+- **Enterprise Support**: enterprise@hirova.com
 
 ### Contact Information
 
-**InterXAI Development Team**
-- **Website**: [https://interxai.com](https://interxai.com)
-- **Email**: info@interxai.com
-- **Phone**: +1-555-INTERXAI (+1-555-468-3792)
+**Hirova Development Team**
+- **Website**: [https://hirova.com](https://hirova.com)
+- **Email**: info@hirova.com
+- **Phone**: +1-555-HIROVA (+1-555-468-3792)
 - **Address**: 123 Innovation Drive, Tech Valley, CA 94000
 
 ---
@@ -702,8 +702,8 @@ SOFTWARE.
 
 #### Backend Setup
 ```bash
-git clone https://github.com/yourorg/interxai.git
-cd interxai/backend
+git clone https://github.com/yourorg/hirova.git
+cd hirova/backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt

@@ -18,7 +18,7 @@ from .request_models import *
 from .prompts import *
 from .config import InterviewConfig
 # Django setup
-# sys.path.append('/home/sathwik/InterXAI-v2/')
+# sys.path.append('/home/sathwik/Hirova-v2/')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 

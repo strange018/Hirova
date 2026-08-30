@@ -579,7 +579,7 @@ const SignUp = () => {
             <div className="glassmorphic rounded-3xl p-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <div className="text-center mb-4">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                  Join InterXAI
+                  Join Hirova
                 </h2>
                 <p className="text-gray-600 text-sm">
                   Start your journey
@@ -887,7 +887,7 @@ const SignUp = () => {
           <div className="overlay-container">
             <div className="overlay">
               <div className="overlay-panel overlay-left">
-                <h1 className="text-2xl font-bold text-white">Welcome to InterXAI!</h1>
+                <h1 className="text-2xl font-bold text-white">Welcome to Hirova!</h1>
                 <p className="text-white/80 mt-2 mb-4 text-sm">Already have an account?</p>
                 <button className="ghost text-sm py-2 px-6" onClick={toggle}>Log In</button>
               </div>
