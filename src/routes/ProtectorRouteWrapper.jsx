@@ -77,8 +77,8 @@
   //        if (typeof window !== 'undefined' && window.faceapi) {
   //          try {
   //            await Promise.all([
-  //              window.faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-  //              window.faceapi.nets.faceLandmark68Net.loadFromUri('/models')
+  //              window.faceapi.nets.tinyFaceDetector.loadFromUri(`${import.meta.env.BASE_URL}models`),
+  //              window.faceapi.nets.faceLandmark68Net.loadFromUri(`${import.meta.env.BASE_URL}models`)
   //            ]);
   //            setModelsLoaded(true);
   //            logEvent('AI models loaded successfully', 'success');
@@ -604,8 +604,8 @@
 //         if (typeof window !== 'undefined' && window.faceapi) {
 //           try {
 //             await Promise.all([
-//               window.faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-//               window.faceapi.nets.faceLandmark68Net.loadFromUri('/models')
+//               window.faceapi.nets.tinyFaceDetector.loadFromUri(`${import.meta.env.BASE_URL}models`),
+//               window.faceapi.nets.faceLandmark68Net.loadFromUri(`${import.meta.env.BASE_URL}models`)
 //             ]);
 //             setModelsLoaded(true);
 //             logEvent('AI models loaded successfully', 'success');
@@ -1380,8 +1380,8 @@
 //   const navigate = useNavigate();
 
 //   // Pinata Configuration
-//   const PINATA_API_KEY = "8a9b5a93c77cc42ca922"
-//   const PINATA_SECRET_KEY = "4d3a76be82bbdd5d32f13b480930d966c16d19f7a1e5d419dd1c939eac2e80c6";
+//   const PINATA_API_KEY = ""; // removed: keys must never be in the code (rotate the old one)
+//   const PINATA_SECRET_KEY = ""; // removed
 
 //   const getSessionInfo = () => {
 //     if (location.pathname.includes('/interview/start/')) {
@@ -2035,8 +2035,8 @@
 //         if (typeof window !== 'undefined' && window.faceapi) {
 //           try {
 //             await Promise.all([
-//               window.faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-//               window.faceapi.nets.faceLandmark68Net.loadFromUri('/models')
+//               window.faceapi.nets.tinyFaceDetector.loadFromUri(`${import.meta.env.BASE_URL}models`),
+//               window.faceapi.nets.faceLandmark68Net.loadFromUri(`${import.meta.env.BASE_URL}models`)
 //             ]);
 //             setModelsLoaded(true);
 //             logEvent('AI models loaded successfully', 'success');
@@ -2407,8 +2407,8 @@
 //   const location = useLocation();
 //   const navigate = useNavigate();
 
-//   const PINATA_API_KEY = "8a9b5a93c77cc42ca922";
-//   const PINATA_SECRET_KEY = "4d3a76be82bbdd5d32f13b480930d966c16d19f7a1e5d419dd1c939eac2e80c6";
+//   const PINATA_API_KEY = ""; // removed: keys must never be in the code (rotate the old one)
+//   const PINATA_SECRET_KEY = ""; // removed
 
 //   const getSessionInfo = () => {
 //     if (location.pathname.includes('/interview/start/')) {
@@ -3061,8 +3061,8 @@
 //         if (typeof window !== 'undefined' && window.faceapi) {
 //           try {
 //             await Promise.all([
-//               window.faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-//               window.faceapi.nets.faceLandmark68Net.loadFromUri('/models')
+//               window.faceapi.nets.tinyFaceDetector.loadFromUri(`${import.meta.env.BASE_URL}models`),
+//               window.faceapi.nets.faceLandmark68Net.loadFromUri(`${import.meta.env.BASE_URL}models`)
 //             ]);
 //             setModelsLoaded(true);
 //             logEvent('AI models loaded successfully', 'success');
@@ -4154,8 +4154,8 @@ const ProctoredContent = ({ children }) => {
         if (typeof window !== 'undefined' && window.faceapi) {
           try {
             await Promise.all([
-              window.faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-              window.faceapi.nets.faceLandmark68Net.loadFromUri('/models')
+              window.faceapi.nets.tinyFaceDetector.loadFromUri(`${import.meta.env.BASE_URL}models`),
+              window.faceapi.nets.faceLandmark68Net.loadFromUri(`${import.meta.env.BASE_URL}models`)
             ]);
             setModelsLoaded(true);
             logEvent('AI models loaded successfully', 'success');

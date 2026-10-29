@@ -17,9 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
+from .proxy_views import AIChatView, ResumeUploadView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/ai/chat/', AIChatView.as_view(), name='ai_chat'),
+    path('api/uploads/resume/', ResumeUploadView.as_view(), name='resume_upload'),
     path('api/users/', include('users.urls')),
     path('api/organization/', include('organization.urls')),
     path('api/interview/', include('interview.urls')),

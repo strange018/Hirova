@@ -28,12 +28,14 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "abc"
-if not SECRET_KEY:
-    raise Exception("SECRET_KEY not set in environment")
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
+
+# Read from the environment: a key written in the code is public to anyone who can read the repository, and lets them
+# forge sessions and password-reset links. Only local development (DEBUG=True) may run without one.
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or os.getenv("SECRET_KEY") or ("dev-only-insecure-key" if DEBUG else None)
+if not SECRET_KEY:
+    raise Exception("DJANGO_SECRET_KEY not set in environment")
 
 
 ALLOWED_HOSTS = [

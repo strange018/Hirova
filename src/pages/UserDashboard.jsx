@@ -1161,13 +1161,13 @@ export default function UserDashboard() {
 
     const form = new FormData();
     form.append("file", file, `resume_${interviewId}_${file.name}`);
-    form.append("network", "public");
 
     try {
-      const res = await fetch("https://uploads.pinata.cloud/v3/files", {
+      // Through the backend, which holds the upload key (it must never be in the browser bundle).
+      const res = await fetch(`${API_URL}/uploads/resume/`, {
         method: "POST",
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_PINATA_JWT_TOKEN}`,
+          'Authorization': `Token ${getAuthToken()}`,
         },
         body: form,
       });

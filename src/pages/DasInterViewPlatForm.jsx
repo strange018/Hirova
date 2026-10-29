@@ -147,10 +147,11 @@ const DSAInterviewPlatform = () => {
 
   const callGroqAPI = async (prompt) => {
     try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      // Through the backend, which holds the AI key (it must never be in the browser bundle).
+      const response = await fetch(`${base_url}/ai/chat/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
+          'Authorization': `Token ${getAuthToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

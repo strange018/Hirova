@@ -297,13 +297,14 @@ const Leaderboard = () => {
     setIsChatLoading(true);
 
     try {
-      const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+      const API_URL = import.meta.env.VITE_API_URL;
       const candidateContext = generateCandidateContext(selectedCandidate);
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      // Through the backend, which holds the AI key (it must never be in the browser bundle).
+      const response = await fetch(`${API_URL}/ai/chat/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Authorization': `Token ${getAuthToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

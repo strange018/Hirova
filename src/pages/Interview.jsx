@@ -5,7 +5,6 @@ import { Calendar, Clock, Users, Plus, Trash2, ChevronRight, ChevronLeft, Save, 
 import { getAuthToken } from '../utils/handleToken';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast} from 'react-toastify';
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const baseUrl = import.meta.env.VITE_API_URL;
 // Form Container Component
 const FormContainer = ({ children, isVisible = true }) => (
@@ -283,11 +282,6 @@ const QuestionsConfig = ({ onNext, onBack, formData, setFormData }) => {
   };
 
 const generateQuestionsWithGroq = async () => {
-  if (!GROQ_API_KEY) {
-    toast.error('Groq API key not configured');
-    return;
-  }
-
   setIsGenerating(true);
 
   try {
@@ -314,13 +308,14 @@ Example:
   }
 ]`;
 
+    // Through the backend, which holds the AI key (it must never be in the browser bundle).
     const response = await fetch(
-      'https://api.groq.com/openai/v1/chat/completions',
+      `${baseUrl}/ai/chat/`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${GROQ_API_KEY}`,
+          Authorization: `Token ${getAuthToken()}`,
         },
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
